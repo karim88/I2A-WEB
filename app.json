@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "i2a-web",
+    "slug": "i2a-web",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "i2a-web"
+}
