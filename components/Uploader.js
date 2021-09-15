@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Text, View, TextInput, Button, Image, Platform } from 'react-native';
+import { Image, TextInput } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-
+import { Text, Slider, VStack, Button, Toast, Divider, HStack, Box } from 'native-base'
 
 const SERVER_URL = 'http://192.168.1.109:5000';
 
@@ -10,8 +10,9 @@ class Uploader extends Component {
         super(props);
         this.state = {
             file: '',
-            cols: 0.43,
-            scale: 80
+            cols: 80,
+            scale: 0.43,
+            ascii: []
         };
         this.updateValue.bind(this)
     }
@@ -57,7 +58,7 @@ class Uploader extends Component {
         })
 
         await fetch(`${SERVER_URL}/api/convert`, {
-            crossDomain:true,
+            crossDomain: true,
             redirect: 'follow',
             method: 'POST',
             body: data,
@@ -65,42 +66,87 @@ class Uploader extends Component {
             .then((response) => response.json())
             .then((response) => {
                 console.log('response', response);
+                this.updateValue('ascii', response.ascii)
+                this.updateValue('file', '')
+                Toast.show({
+                    title: 'Info',
+                    description: response.message,
+                    placement: 'bottom',
+                    status: 'info',
+                })
             })
             .catch((error) => {
                 console.log('error', error);
+                Toast.show({
+                    title: 'Warning!',
+                    description: error,
+                    placement: 'bottom',
+                    status: 'warning',
+                })
             });
     }
 
     render() {
         return (
-            <View style={{ padding: 10 }}>
+            <VStack space={4} style={{ padding: 10 }}>
                 {this.state.file && (
                     <>
                         <Image
                             source={{ uri: this.state.file.uri }}
                             style={{ width: 300, height: 300 }}
                         />
-                        <Button title="Upload Photo" onPress={this.handleUploadPhoto} />
+                        <Button title="Upload Photo" onPress={this.handleUploadPhoto}>Upload Photo</Button>
                     </>
                 )}
-                {!this.state.file && <Button title="Choose Photo" onPress={this.handleChoosePhoto} />}
+                {!this.state.file && <Button title="Choose Photo" onPress={this.handleChoosePhoto}>Choose Photo</Button>}
 
-                <TextInput
-                    style={{ height: 40 }}
-                    placeholder="Scale"
-                    onChangeText={scale => this.updateValue('scale', scale)}
-                    defaultValue={this.state.scale}
-                />
-                <TextInput
-                    style={{ height: 40 }}
-                    placeholder="Cols"
-                    onChangeText={cols => this.updateValue('cols', cols)}
-                    defaultValue={this.state.cols}
-                />
-                <Text style={{ padding: 10, fontSize: 42 }}>
-                    {this.state.cols} | {this.state.scale}
-                </Text>
-            </View>
+                <Divider></Divider>
+
+                <HStack space={2} alignItems="center">
+                    <Box>
+                        <Text alignItems="start">Scale</Text>
+                        <Slider
+                            defaultValue={this.state.scale}
+                            minValue={0}
+                            maxValue={1}
+                            accessibilityLabel="Scale"
+                            step={.1}
+                            onChangeText={scale => this.updateValue('scale', scale)}
+                        >
+                            <Slider.Track>
+                                <Slider.FilledTrack />
+                            </Slider.Track>
+                            <Slider.Thumb />
+                        </Slider>
+
+                    </Box>
+                    <Box>
+                        <Text>Cols</Text>
+                        <Slider
+                            defaultValue={this.state.cols}
+                            minValue={0}
+                            maxValue={100}
+                            accessibilityLabel="Cols"
+                            step={1}
+                            onChangeText={cols => this.updateValue('cols', cols)}
+                        >
+                            <Slider.Track>
+                                <Slider.FilledTrack />
+                            </Slider.Track>
+                            <Slider.Thumb />
+                        </Slider>
+
+                    </Box>
+                </HStack>
+
+                <Divider></Divider>
+
+                {this.state.ascii && (
+                    <pre style={{ padding: 10, fontSize: 12 }}>
+                        {this.state.ascii.map(line => `${line}\n`)}
+                    </pre>
+                )}
+            </VStack>
         );
     }
 }

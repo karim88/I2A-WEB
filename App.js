@@ -1,15 +1,24 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { NativeBaseProvider, Box, Heading, Center } from 'native-base';
 import Uploader from './components/Uploader';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>I2A</Text>
-      <Uploader></Uploader>
+    <NativeBaseProvider>
+      <Center>
+        <Heading alignSelf={{
+          base: "center",
+          md: "flex-start",
+          size: "4xl"
+        }}>I2A</Heading>
+      </Center>
+      <Box>
+        <Uploader></Uploader>
+      </Box>
       <StatusBar style="auto" />
-    </View>
+    </NativeBaseProvider>
   );
 }
 
