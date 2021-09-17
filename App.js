@@ -6,27 +6,40 @@ import Uploader from './components/Uploader';
 
 export default function App() {
   return (
-    <NativeBaseProvider>
-      <Center>
+    <NativeBaseProvider style={styles.body}>
+      <Center style={styles.container}>
         <Heading alignSelf={{
           base: "center",
           md: "flex-start",
           size: "4xl"
         }}>I2A</Heading>
       </Center>
-      <Box>
+      <Box style={styles.box}>
         <Uploader></Uploader>
       </Box>
-      <StatusBar style="auto" />
+      <StatusBar style={styles.statusbar} />
     </NativeBaseProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  body: {
+    backgroundColor: '#fefce8',
+    flex: 1
   },
+  container: {
+    paddingTop: 40,
+    justifyContent: 'center',
+    backgroundColor: '#fefce8',
+    flex: 1
+  },
+  box: {
+    backgroundColor: '#fefce8',
+    flex: 5
+  },
+  statusbar: {
+    display: 'inline',
+    backgroundColor: '#ca8a04',
+    flex: 1
+  }
 });

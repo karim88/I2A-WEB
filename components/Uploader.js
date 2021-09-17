@@ -1,7 +1,9 @@
-import React, { Component } from 'react';
-import { Image, TextInput } from 'react-native';
+import React, { Component, createRef } from 'react';
+import { Image, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Text, Slider, VStack, Button, Toast, Divider, HStack, Box } from 'native-base'
+import { Text, Slider, VStack, Button, Toast, Divider, HStack, Box, SimpleGrid } from 'native-base'
+import domtoimage from 'dom-to-image';
+
 
 const SERVER_URL = 'http://192.168.1.109:5000';
 
@@ -14,6 +16,8 @@ class Uploader extends Component {
             scale: 0.43,
             ascii: []
         };
+        this.ref = createRef()
+        this.imgRef = createRef()
         this.updateValue.bind(this)
     }
 
@@ -68,6 +72,18 @@ class Uploader extends Component {
                 console.log('response', response);
                 this.updateValue('ascii', response.ascii)
                 this.updateValue('file', '')
+                domtoimage.toJpeg(this.ref.current, { bgcolor: '#fff' })
+                .then(res => {
+                    this.imgRef.current.innerHTML = ''
+                    const img = document.createElement('img');
+                    img.src = res;
+                    img.style = `width: 100%;`
+                    this.imgRef.current.appendChild(img);
+                    this.updateValue('ascii', null)
+                })
+                .catch(function (error) {
+                    console.error("oops, something went wrong!", error);
+                  });
                 Toast.show({
                     title: 'Info',
                     description: response.message,
@@ -88,7 +104,7 @@ class Uploader extends Component {
 
     render() {
         return (
-            <VStack space={4} style={{ padding: 10 }}>
+            <VStack space={4} style={styles.stack}>
                 {this.state.file && (
                     <>
                         <Image
@@ -102,8 +118,8 @@ class Uploader extends Component {
 
                 <Divider></Divider>
 
-                <HStack space={2} alignItems="center">
-                    <Box>
+                <SimpleGrid columns="2">
+                    <Box style={styles.box}>
                         <Text alignItems="start">Scale</Text>
                         <Slider
                             defaultValue={this.state.scale}
@@ -120,7 +136,7 @@ class Uploader extends Component {
                         </Slider>
 
                     </Box>
-                    <Box>
+                    <Box style={styles.box}>
                         <Text>Cols</Text>
                         <Slider
                             defaultValue={this.state.cols}
@@ -137,18 +153,34 @@ class Uploader extends Component {
                         </Slider>
 
                     </Box>
-                </HStack>
+                </SimpleGrid>
 
                 <Divider></Divider>
 
                 {this.state.ascii && (
-                    <pre style={{ padding: 10, fontSize: 12 }}>
+                    <pre ref={this.ref} style={{ padding: 10, fontSize: 12 }}>
                         {this.state.ascii.map(line => `${line}\n`)}
                     </pre>
                 )}
+                <div ref={this.imgRef}></div>
             </VStack>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    stack: {
+        backgroundColor: '#e7e5e4',
+        margin: 40,
+        padding: 40,
+        borderRadius: 5,
+    },
+    box: {
+        textAlign: 'center',
+    },
+    image: {
+        width: '100%'
+    }
+});
 
 export default Uploader;

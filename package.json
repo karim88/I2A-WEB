@@ -7,6 +7,7 @@
     "start": "react-native start"
   },
   "dependencies": {
+    "dom-to-image": "^2.6.0",
     "expo": "~42.0.1",
     "expo-image-picker": "~10.2.2",
     "expo-splash-screen": "~0.11.2",
